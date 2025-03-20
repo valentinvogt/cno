@@ -20,10 +20,10 @@ if len(sys.argv) <= 2:
         "scheduler_step": 1,
         "scheduler_gamma": 0.9,
         "epochs": 100,
-        "batch_size": 32,         
+        "batch_size": 8,         
         "time_steps": 7,          # How many time steps to select?
         "dt": 1,                  # What is the time step? (1 means include entire traj, 2 means taking every other step, etc.
-        "training_samples": 32,   # How many training samples?
+        "training_samples": 8,   # How many training samples?
         "time_input": 1,          # Should we include time in the input channels?
         "allowed": 'all',         # All2ALL (train) - all , or One2All (train) - one2all, AR training - one
         "cluster": True,          # Something internal (don't bother)
@@ -58,14 +58,14 @@ if len(sys.argv) <= 2:
     # "eul_kh", "eul_riemann", "eul_riemann_kh", "eul_riemann_cur", "eul_gauss"
     # "rich_mesh", "rayl_tayl" "kolmogorov"
     # "wave_seismic", "wave_gauss", "allen_cahn"
-    # "airfoil", "poisson_gauss", "helmholtz"
+    # "airfoil", "poisson_gauss", "helmholtz", "brusselator"
     
     # FOR PRETRAINING CNO-FM: which_example = "eul_ns_mix1"
     
     # WHAT IS THE EXPERIMENT?
-    which_example = "rich_mesh"
+    which_example = "brusselator"
     
-    folder = "--- PROVIDE THE FOLDER TO SAVE THE MODEL ----" 
+    folder = "/cluster/work/math/vogtva/models/cno" 
     
 else:
     raise ValueError("To many args")

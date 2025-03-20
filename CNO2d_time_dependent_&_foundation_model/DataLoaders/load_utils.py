@@ -1,4 +1,4 @@
-from DataLoaders.CNO_TimeLoaders import BrownianBridgeTimeDataset, VortexSheetTimeDataset, SinesTimeDataset, PiecewiseConstantsTimeDataset, GaussiansTimeDataset, ComplicatedShearLayerTimeDataset, KelvinHelmholtzTimeDataset, RiemannTimeDataset, RiemannCurvedTimeDataset, EulerGaussTimeDataset, RiemannKHTimeDataset, RichtmyerMeshkov, RayleighTaylor, PoissonGaussians,  Helmholtz, AllenCahn, WaveSeismic, WaveGaussians,PiecewiseConstantsTraceTimeDataset, KolmogorovFlow, Airfoil
+from DataLoaders.CNO_TimeLoaders import BrownianBridgeTimeDataset, VortexSheetTimeDataset, SinesTimeDataset, PiecewiseConstantsTimeDataset, GaussiansTimeDataset, ComplicatedShearLayerTimeDataset, KelvinHelmholtzTimeDataset, RiemannTimeDataset, RiemannCurvedTimeDataset, EulerGaussTimeDataset, RiemannKHTimeDataset, RichtmyerMeshkov, RayleighTaylor, PoissonGaussians,  Helmholtz, AllenCahn, WaveSeismic, WaveGaussians,PiecewiseConstantsTraceTimeDataset, KolmogorovFlow, Airfoil, BrusselatorTimeDataset
 
 def _load_dataset(dic, 
                   which, 
@@ -277,7 +277,19 @@ def _load_dataset(dic,
                                    time_input = False,
                                    masked_input = None)
     
-    
+    elif which == "brusselator":
+        train_dataset =  BrusselatorTimeDataset(
+                                   max_num_time_steps = dic["time_steps"], 
+                                                    time_step_size = dic["dt"],
+                                                    fix_input_to_time_step = fix_input_to_time_step,
+                                                    which = which_loader,
+                                                    resolution = 128,
+                                                    in_dist = True,
+                                                    num_trajectories = num_samples,
+                                                    data_path = "/cluster/work/math/vogtva/data/bruss/default_bruss",
+                                                    time_input = dic["time_input"],
+                                                    masked_input = masked_input,
+                                                    allowed_transitions = dic["allowed_tran"])
     else:
         raise ValueError("Not implemented experiment")
 

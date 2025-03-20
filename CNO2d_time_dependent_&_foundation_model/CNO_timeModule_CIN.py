@@ -1064,7 +1064,7 @@ class CNO_time(pl.LightningModule):
                                           out_dim = self.out_dim,
                                           masked_input = mask)
         
-        train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=6)
+        train_loader = DataLoader(train_dataset, batch_size=self.batch_size, shuffle=True, num_workers=4)
         return train_loader
         
     def validation_step(self, batch, batch_idx, dataloader_idx = 0):
@@ -1221,7 +1221,7 @@ class CNO_time(pl.LightningModule):
             
             val_loaders = []
             for dataset in val_datasets:
-                val_loaders.append(DataLoader(dataset, batch_size=self.batch_size, shuffle=False, num_workers=6))
+                val_loaders.append(DataLoader(dataset, batch_size=self.batch_size, shuffle=False, num_workers=4))
                 
         else:
             is_masked = "is_masked" in self.loader_dictionary and self.loader_dictionary["is_masked"] is not None
@@ -1242,7 +1242,7 @@ class CNO_time(pl.LightningModule):
                                           out_dim = self.out_dim,
                                           masked_input = mask)
             self.val_labels =[which+"_"]
-            val_loaders = [DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=6)]
+            val_loaders = [DataLoader(val_dataset, batch_size=self.batch_size, shuffle=False, num_workers=4)]
         
         self.num_validation_loaders = num_datasets
         self.num_out_loaders        = num_out
