@@ -13,7 +13,8 @@ def _load_dataset(dic,
         num_samples = 19640
     if "eul_" in which and dic["num_samples"]>9640:
         num_samples = 9640
-    
+    if "bruss" in which:
+        num_samples = 10_800 - 280
     print("WHICH: ", which, " NUM_SAMPLES: ", num_samples)
 
 
@@ -286,7 +287,7 @@ def _load_dataset(dic,
                                                     resolution = 128,
                                                     in_dist = True,
                                                     num_trajectories = num_samples,
-                                                    data_path = "/cluster/work/math/vogtva/data/bruss/default_bruss",
+                                                    data_path = "/cluster/scratch/vogtva/data/bruss/param_sweep",
                                                     time_input = dic["time_input"],
                                                     masked_input = masked_input,
                                                     allowed_transitions = dic["allowed_tran"])

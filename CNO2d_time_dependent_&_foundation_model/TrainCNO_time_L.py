@@ -20,13 +20,14 @@ if len(sys.argv) <= 2:
         "scheduler_step": 1,
         "scheduler_gamma": 0.9,
         "epochs": 100,
-        "batch_size": 8,         
-        "time_steps": 7,          # How many time steps to select?
+        "batch_size": 32,         
+        "time_steps": 9,          # How many time steps to select?
         "dt": 1,                  # What is the time step? (1 means include entire traj, 2 means taking every other step, etc.
-        "training_samples": 8,   # How many training samples?
+        "training_samples": 10800,   # How many training samples?
         "time_input": 1,          # Should we include time in the input channels?
         "allowed": 'all',         # All2ALL (train) - all , or One2All (train) - one2all, AR training - one
         "cluster": True,          # Something internal (don't bother)
+        "exp": 1,               # Debugging
     }
     
     model_architecture_ = {
@@ -65,7 +66,7 @@ if len(sys.argv) <= 2:
     # WHAT IS THE EXPERIMENT?
     which_example = "brusselator"
     
-    folder = "/cluster/work/math/vogtva/models/cno" 
+    folder = "/cluster/scratch/vogtva/models/cno" 
     
 else:
     raise ValueError("To many args")

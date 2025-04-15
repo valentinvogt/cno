@@ -116,3 +116,12 @@ corresponds to the dataloaders for the CNO model.
 
 To compute the relative L1 median errors of the CNOmodels, one scould run the scripts *TestCNO_ALL.py*.  One should set relevant parameters to theit true values to be able to run the script.
 
+If brusselator u,v are to be treated as two components of one variable:
+```
+// "separate": true,
+// "separate_dim": [
+//     2,
+//     1
+// ]
+```
+(Don't forget to change TestCNO_All.py:405)

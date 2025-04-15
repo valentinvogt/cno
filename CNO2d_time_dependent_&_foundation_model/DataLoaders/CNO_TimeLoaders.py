@@ -1685,9 +1685,9 @@ class BrusselatorTimeDataset(BaseTimeDataset):
         super().__init__(*args, **kwargs)
         assert self.max_num_time_steps * self.time_step_size <= 150
 
-        self.N_max = 16
-        self.N_val = 2
-        self.N_test = 2
+        self.N_max = 10_800
+        self.N_val = 40
+        self.N_test = 240
 
         if self.in_dist:
             data_path = self.data_path + "/_dataset_proc.nc"
@@ -1695,10 +1695,11 @@ class BrusselatorTimeDataset(BaseTimeDataset):
             raise NotImplementedError()
 
         self.reader = h5py.File(data_path, "r")
-
         if self.masked_input is None:
-            self.mean = torch.tensor([0.0, 0.0, 0.0], dtype=torch.float32).unsqueeze(1).unsqueeze(1)
-            self.std = torch.tensor([1.0, 1.0, 1.0], dtype=torch.float32).unsqueeze(1).unsqueeze(1)
+            mean = torch.zeros(6, dtype=torch.float32)
+            self.mean = mean.unsqueeze(1).unsqueeze(1)
+            std = torch.ones(6, dtype=torch.float32)
+            self.std = std.unsqueeze(1).unsqueeze(1)
         else:
             self.mean = torch.tensor([0.80, 0.0,   0.0,   0.0], dtype=torch.float32).unsqueeze(1).unsqueeze(1)
             self.std = torch.tensor( [0.31, 0.391, 0.356, 0.46], dtype=torch.float32).unsqueeze(1).unsqueeze(1)
@@ -1718,19 +1719,18 @@ class BrusselatorTimeDataset(BaseTimeDataset):
             t1 = self.fix_input_to_time_step
             t2 = self.time_step_size * (_idx + 1)
             t = t2 - t1
-        time = t / 20.0
-        
+        time = t / 20.0 # TODO
         
         inputs = (
             # torch.from_numpy(self.reader["sample_" + str(i + self.start)][:][t1])
-            torch.from_numpy(self.reader["data"][:][i + self.start, t1, :, :])
+            torch.from_numpy(self.reader["data"][i + self.start, t1, :, :, : ])
             .type(torch.float32)
-            .reshape(3, self.resolution, self.resolution)
+            .reshape(6, self.resolution, self.resolution)
         )
         label = (
-            torch.from_numpy(self.reader["data"][:][i + self.start, t2, :, :])
+            torch.from_numpy(self.reader["data"][i + self.start, t2, :, :, : ])
             .type(torch.float32)
-            .reshape(3, self.resolution, self.resolution)
+            .reshape(6, self.resolution, self.resolution)
         )
         
         if self.masked_input is not None:
