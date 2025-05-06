@@ -2,3 +2,5 @@
 *.err
 __pycache__
 .vscode
+out
+.idea

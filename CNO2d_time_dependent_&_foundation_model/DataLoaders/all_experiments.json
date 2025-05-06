@@ -271,8 +271,14 @@
         "normalize": true,
         "is_masked": null,
         "nmax": 10800,
-        "step_max": 9,
+        "step_max": 7,
         "in_dim": 7,
-        "out_dim": 6
+        "out_dim": 6,
+        "separate": true,
+        "separate_dim": [
+            2,
+            4,
+            1
+        ]
     }
 }

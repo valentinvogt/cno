@@ -1689,6 +1689,8 @@ class BrusselatorTimeDataset(BaseTimeDataset):
         self.N_val = 40
         self.N_test = 240
 
+        self.start_time = 2
+
         if self.in_dist:
             data_path = self.data_path + "/_dataset_proc.nc"
         else:
@@ -1723,12 +1725,12 @@ class BrusselatorTimeDataset(BaseTimeDataset):
         
         inputs = (
             # torch.from_numpy(self.reader["sample_" + str(i + self.start)][:][t1])
-            torch.from_numpy(self.reader["data"][i + self.start, t1, :, :, : ])
+            torch.from_numpy(self.reader["data"][i + self.start, t1 + self.start_time, :, :, : ])
             .type(torch.float32)
             .reshape(6, self.resolution, self.resolution)
         )
         label = (
-            torch.from_numpy(self.reader["data"][i + self.start, t2, :, :, : ])
+            torch.from_numpy(self.reader["data"][i + self.start, t2 + self.start_time, :, :, : ])
             .type(torch.float32)
             .reshape(6, self.resolution, self.resolution)
         )

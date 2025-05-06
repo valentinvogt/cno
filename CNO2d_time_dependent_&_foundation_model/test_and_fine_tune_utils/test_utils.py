@@ -211,7 +211,16 @@ def _load_dict(files,
         d["step_max"] = 1
         d["time_input"] = False
         d["dt"] = 0
-
+    
+    elif which_example in ["brusselator"]:
+        d["in_dim"] = 7
+        d["out_dim"] = 6
+        d["nmax"] = 10_800
+        d["step_max"] = 9
+        d["time_input"] = True
+        d["dt"] = 1
+        d["separate"] = True
+        d["separate_dim"] = [2,4]
     else:
         raise ValueError("Please specify different benchmark")
     
@@ -342,7 +351,7 @@ def _list_models(folders,
     models = []
     for dir in model_dirs:
         
-        model_dir = dir + "/model123"
+        model_dir = dir
         _potential_files = os.listdir(model_dir)
         for file in _potential_files:
             _pass = True
