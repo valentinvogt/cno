@@ -162,10 +162,10 @@ def _test_pattern(
                     device
                 )
                 pred = model(inp, time_batch)
-                # np_pred = pred.cpu().numpy()
-                # np.save(f'out/stat/pred_pattern_{pattern_len}_batch_{step}_jump_{i}.npy', np_pred)
-                # np_out = out.cpu().numpy()
-                # np.save(f'out/stat/out_pattern_{pattern_len}_batch_{step}_jump_{i}.npy', np_out)
+                np_pred = pred.cpu().numpy()
+                np.save(f'out/stat/pred_pattern_{pattern_len}_batch_{step}_jump_{i}.npy', np_pred)
+                np_out = out.cpu().numpy()
+                np.save(f'out/stat/out_pattern_{pattern_len}_batch_{step}_jump_{i}.npy', np_out)
 
                 if is_airfoil:
                     out[input_batch == 1] = 1.0
@@ -436,7 +436,6 @@ if __name__ == "__main__":
     old_in_dim = 5  # PRETRAINING INPUT DIMENSION -- RELEVANT FOR FINETUNNING
 
     if not fine_tuned:
-
         # PROVIDE THE FOLDER WITH ALL THE MODELS FOR SCALING LAW::
         folders = "/cluster/scratch/vogtva/models/cno_delayed_2"
         training_folder = None  # Keep it None

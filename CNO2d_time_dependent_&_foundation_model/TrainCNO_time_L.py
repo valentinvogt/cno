@@ -29,7 +29,7 @@ if len(sys.argv) <= 2:
         "cluster": True,          # Something internal (don't bother)
         "exp": 1,               # Debugging
     }
-    
+ 
     model_architecture_ = {
         "N_layers": 4,            # Number of (D) & (U) blocks 
         "channel_multiplier": 32, # Parameter d_e (how the number of channels changes)

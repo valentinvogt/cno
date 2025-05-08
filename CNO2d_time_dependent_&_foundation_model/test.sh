@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=test-cno
-#SBATCH --output=test-cno-%j.out
-#SBATCH --error=test-cno-%j.err
+#SBATCH --job-name=eval-cno
+#SBATCH --output=eval-cno-%j.out
+#SBATCH --error=eval-cno-%j.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=6
 #SBATCH --gpus-per-node=2
@@ -14,4 +14,4 @@ module load stack/2024-06
 module load  gcc/12.2.0
 module load python_cuda/3.11.6
 
-python TestCNO_ALL.py
+python Eval.py

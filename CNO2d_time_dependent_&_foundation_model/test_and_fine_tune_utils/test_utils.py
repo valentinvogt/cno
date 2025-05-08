@@ -212,10 +212,10 @@ def _load_dict(files,
         d["time_input"] = False
         d["dt"] = 0
     
-    elif which_example in ["brusselator"]:
+    elif which_example in ["brusselator", "brusselator_eval"]:
         d["in_dim"] = 7
         d["out_dim"] = 6
-        d["nmax"] = 10_800
+        d["nmax"] = 10_800 if which_example == "brusselator" else 2_800,
         d["step_max"] = 9
         d["time_input"] = True
         d["dt"] = 1

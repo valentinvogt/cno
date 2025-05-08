@@ -1755,3 +1755,89 @@ class BrusselatorTimeDataset(BaseTimeDataset):
             return time, inputs, label, self.mask
         else:
             return time, inputs, label
+
+class BrusselatorEval(BaseTimeDataset):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        assert self.max_num_time_steps * self.time_step_size <= 150
+
+        self.N_max = 2_800
+        self.N_val = 10
+        self.N_test = 1200
+
+        self.start_time = 2
+
+        if self.in_dist:
+            data_path = self.data_path + "/_dataset_processed.nc"
+        else:
+            raise NotImplementedError()
+
+        self.reader = h5py.File(data_path, "r")
+        if self.masked_input is None:
+            mean = torch.zeros(6, dtype=torch.float32)
+            self.mean = mean.unsqueeze(1).unsqueeze(1)
+            std = torch.ones(6, dtype=torch.float32)
+            self.std = std.unsqueeze(1).unsqueeze(1)
+        else:
+            self.mean = torch.tensor([0.80, 0.0,   0.0,   0.0], dtype=torch.float32).unsqueeze(1).unsqueeze(1)
+            self.std = torch.tensor( [0.31, 0.391, 0.356, 0.46], dtype=torch.float32).unsqueeze(1).unsqueeze(1)
+        
+
+        self.post_init()
+
+    def __getitem__(self, idx):
+        i = idx // self.multiplier
+        _idx = idx - i * self.multiplier
+
+        if self.fix_input_to_time_step is None:
+            t1, t2 = self.time_indices[_idx]
+            assert t2 >= t1
+            t = t2 - t1
+        else:
+            t1 = self.fix_input_to_time_step
+            t2 = self.time_step_size * (_idx + 1)
+            t = t2 - t1
+        time = t / 20.0 # TODO
+        
+        A = self.reader["A"][i + self.start]
+        B = self.reader["B"][i + self.start]
+        Du = self.reader["Du"][i + self.start]
+        Dv = self.reader["Dv"][i + self.start]
+
+        const_fields = torch.tensor([A, B, Du, Dv], dtype=torch.float32).view(4, 1, 1)
+        const_fields = const_fields.expand(-1, self.resolution, self.resolution)
+
+        inputs = torch.cat((
+            torch.from_numpy(self.reader["data"][i + self.start, t1 + self.start_time, :, :, :])
+            .type(torch.float32)
+            .reshape(2, self.resolution, self.resolution),
+            const_fields
+        ), dim=0)
+
+        label = torch.cat((
+            torch.from_numpy(self.reader["data"][i + self.start, t2 + self.start_time, :, :, :])
+            .type(torch.float32)
+            .reshape(2, self.resolution, self.resolution),
+            const_fields
+        ), dim=0)
+        
+        if self.masked_input is not None:
+            inputs_rho = torch.ones((1, self.resolution, self.resolution)).type(torch.float32)
+            inputs_p   = torch.zeros((1, self.resolution, self.resolution)).type(torch.float32)
+            inputs = torch.cat((inputs_rho, inputs), 0)
+            inputs = torch.cat((inputs, inputs_p), 0)
+            
+            label = torch.cat((inputs_rho, label), 0)
+            label = torch.cat((label, inputs_p), 0)
+        
+        inputs = (inputs - self.mean) / self.std
+        label = (label - self.mean) / self.std
+
+        if self.time_input:
+            inputs_t = torch.ones(1, self.resolution, self.resolution).type(torch.float32)*time
+            inputs = torch.cat((inputs, inputs_t), 0)
+        
+        if self.masked_input is not None:
+            return time, inputs, label, self.mask
+        else:
+            return time, inputs, label
