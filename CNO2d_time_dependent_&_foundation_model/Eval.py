@@ -244,7 +244,7 @@ def _test_pattern(
 
             # if step % 1 == 0:
             #     print(step, jump, len(testing_loader))
-
+    print(T)
     return T, E, E_l1
 
 
@@ -449,7 +449,7 @@ if __name__ == "__main__":
 
     # ------------------
     # Other parameters:
-    # ------------------
+    # ------------------  
 
     folder_pattern = "errors"  # WHAT IS THE NAME OF THE FOLDER FOR SAVING ERRORS?
     steps = 7  # HOW MANY STEPS ARE THERE IN THE TRAJECTORY?
@@ -468,7 +468,8 @@ if __name__ == "__main__":
     )
     # DIFFERENT EVALUATION SCHEMES (DIRECT, HETEROG. AR, HOMOG. AR)
     if not steady:
-        patterns = [[7], [3, 3, 1], [1] * 7]  # should sum to 7
+        patterns = [[7]]     # should sum to 7
+        #, [3, 3, 1], [1] * 7]  
         # patterns = [[1] * 9]
     else:
         patterns = [[1]]

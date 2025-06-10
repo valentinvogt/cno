@@ -1,14 +1,13 @@
 #!/bin/bash
 
-#SBATCH --job-name=train-cno
-#SBATCH --output=train-cno-%j.out
-#SBATCH --error=train-cno-%j.err
+#SBATCH --job-name=cno-train
+#SBATCH --output=cno-train-%j.out
+#SBATCH --error=cno-train-%j.err
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=4
 #SBATCH --gpus-per-node=8
-#SBATCH --time=2-12:00:00
+#SBATCH --time=20:00:00
 #SBATCH --mem-per-cpu=8192
-#SBATCH --constraint=EPYC_7742
 #SBATCH --mail-type=END
 
 module load stack/2024-06

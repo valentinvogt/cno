@@ -13,8 +13,8 @@ def _load_dataset(dic,
         num_samples = 19640
     if "eul_" in which and dic["num_samples"]>9640:
         num_samples = 9640
-    if "bruss" in which:
-        num_samples = 10_800 - 280
+    if which == "brusselator":
+        num_samples = 10_000 - 60 - 240
     print("WHICH: ", which, " NUM_SAMPLES: ", num_samples)
 
 
@@ -280,17 +280,17 @@ def _load_dataset(dic,
     
     elif which == "brusselator":
         train_dataset =  BrusselatorTimeDataset(
-                                   max_num_time_steps = dic["time_steps"], 
-                                                    time_step_size = dic["dt"],
-                                                    fix_input_to_time_step = fix_input_to_time_step,
-                                                    which = which_loader,
-                                                    resolution = 128,
-                                                    in_dist = True,
-                                                    num_trajectories = num_samples,
-                                                    data_path = "/cluster/scratch/vogtva/data/bruss/param_sweep",
-                                                    time_input = dic["time_input"],
-                                                    masked_input = masked_input,
-                                                    allowed_transitions = dic["allowed_tran"])
+            max_num_time_steps = dic["time_steps"], 
+                            time_step_size = dic["dt"],
+                            fix_input_to_time_step = fix_input_to_time_step,
+                            which = which_loader,
+                            resolution = 128,
+                            in_dist = True,
+                            num_trajectories = num_samples,
+                            data_path = "/cluster/scratch/vogtva/data/bruss/final",
+                            time_input = dic["time_input"],
+                            masked_input = masked_input,
+                            allowed_transitions = dic["allowed_tran"])
     elif which == "brusselator_eval":
         train_dataset =  BrusselatorEval(
                         max_num_time_steps = dic["time_steps"], 
@@ -299,8 +299,8 @@ def _load_dataset(dic,
                         which = which_loader,
                         resolution = 128,
                         in_dist = True,
-                        num_trajectories = 2_800 - 1200 - 10,
-                        data_path = "/cluster/scratch/vogtva/data/bruss/stat_an",
+                        num_trajectories = 880,
+                        data_path = "/cluster/scratch/vogtva/data/bruss/stat_one",
                         time_input = dic["time_input"],
                         masked_input = masked_input,
                         allowed_transitions = dic["allowed_tran"])                                  

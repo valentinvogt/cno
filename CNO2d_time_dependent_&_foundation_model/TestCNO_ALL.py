@@ -94,6 +94,7 @@ def _test_pattern(
     is_masked=None,
     steady=False,
     is_airfoil=False,
+    model_id="model123"
 ):
 
     print("batch_size", batch_size)
@@ -162,10 +163,13 @@ def _test_pattern(
                     device
                 )
                 pred = model(inp, time_batch)
-                # np_pred = pred.cpu().numpy()
-                # np.save(f'out/stat/pred_pattern_{pattern_len}_batch_{step}_jump_{i}.npy', np_pred)
-                # np_out = out.cpu().numpy()
-                # np.save(f'out/stat/out_pattern_{pattern_len}_batch_{step}_jump_{i}.npy', np_out)
+                path = f'out/{model_id}'
+                os.makedirs(path, exist_ok=True)
+                
+                np_pred = pred.cpu().numpy()
+                np.save(f'{path}/pred_pattern_{pattern_len}_batch_{step}_jump_{i}.npy', np_pred)
+                np_out = out.cpu().numpy()
+                np.save(f'{path}/out_pattern_{pattern_len}_batch_{step}_jump_{i}.npy', np_out)
 
                 if is_airfoil:
                     out[input_batch == 1] = 1.0
@@ -291,6 +295,7 @@ def _evaulate_models(
     for folder, _model_file in model_dirs:
 
         print(folder, _model_file)
+        model_id = os.path.basename(folder)
         _subfolders = os.listdir(folder)
         _pass = True  # Should we do anything?
 
@@ -384,6 +389,7 @@ def _evaulate_models(
                     is_masked=is_masked,
                     steady=steady,
                     is_airfoil=is_airfoil,
+                    model_id=model_id
                 )
 
                 #########################
@@ -429,7 +435,7 @@ if __name__ == "__main__":
     # "airfoil", "poisson_gauss", "helmholtz", "brusselator"
 
     # WHAT IS THE EXPERIMENT?
-    which_example = "brusselator_eval"
+    which_example = "brusselator"
 
     # IS THE MODEL FINETUNED?
     fine_tuned = False
@@ -438,7 +444,7 @@ if __name__ == "__main__":
     if not fine_tuned:
 
         # PROVIDE THE FOLDER WITH ALL THE MODELS FOR SCALING LAW::
-        folders = "/cluster/scratch/vogtva/models/cno_delayed_2"
+        folders = "/cluster/scratch/vogtva/models/bruss_final/"
         training_folder = None  # Keep it None
 
     else:

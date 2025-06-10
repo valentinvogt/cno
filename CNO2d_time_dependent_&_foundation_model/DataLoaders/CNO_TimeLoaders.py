@@ -167,15 +167,21 @@ class BaseTimeDataset(BaseDataset, ABC):
             self.multiplier = len(self.time_indices)
             print("time_indices", self.time_indices)
         
+        seed = 0
+        rng = torch.Generator().manual_seed(seed)
+        all_indices = torch.randperm(self.N_max, generator=rng).tolist()
         if self.which == "train":
             self.length = self.num_trajectories * self.multiplier
             self.start = 0
+            self.indices = all_indices[:self.num_trajectories]
         elif self.which == "val":
             self.length = self.N_val * self.multiplier
             self.start = self.N_max - self.N_val - self.N_test
+            self.indices = all_indices[self.num_trajectories:self.num_trajectories + self.N_val]
         else:
             self.length = self.N_test * self.multiplier
             self.start = self.N_max - self.N_test
+            self.indices = all_indices[self.num_trajectories + self.N_val:]
 
 #--------------------------------------------------------
 # Navier-Stokes Datasets:
@@ -1685,14 +1691,14 @@ class BrusselatorTimeDataset(BaseTimeDataset):
         super().__init__(*args, **kwargs)
         assert self.max_num_time_steps * self.time_step_size <= 150
 
-        self.N_max = 10_800
-        self.N_val = 40
+        self.N_max = 10_000
+        self.N_val = 60
         self.N_test = 240
 
         self.start_time = 2
 
         if self.in_dist:
-            data_path = self.data_path + "/_dataset_proc.nc"
+            data_path = self.data_path + "/_dataset_processed.nc"
         else:
             raise NotImplementedError()
 
@@ -1706,11 +1712,17 @@ class BrusselatorTimeDataset(BaseTimeDataset):
             self.mean = torch.tensor([0.80, 0.0,   0.0,   0.0], dtype=torch.float32).unsqueeze(1).unsqueeze(1)
             self.std = torch.tensor( [0.31, 0.391, 0.356, 0.46], dtype=torch.float32).unsqueeze(1).unsqueeze(1)
         
-
+        if self.reader["data"].shape[2] == 2:
+            self.is_param_component_missing = True
+        elif self.reader["data"].shape[2] == 6:
+            self.is_param_component_missing = False
+        else:
+            raise ValueError("The data should have 6 (2) channels!")
         self.post_init()
 
     def __getitem__(self, idx):
         i = idx // self.multiplier
+        shuffled_i =  self.indices[i]
         _idx = idx - i * self.multiplier
 
         if self.fix_input_to_time_step is None:
@@ -1723,17 +1735,39 @@ class BrusselatorTimeDataset(BaseTimeDataset):
             t = t2 - t1
         time = t / 20.0 # TODO
         
-        inputs = (
-            # torch.from_numpy(self.reader["sample_" + str(i + self.start)][:][t1])
-            torch.from_numpy(self.reader["data"][i + self.start, t1 + self.start_time, :, :, : ])
-            .type(torch.float32)
-            .reshape(6, self.resolution, self.resolution)
-        )
-        label = (
-            torch.from_numpy(self.reader["data"][i + self.start, t2 + self.start_time, :, :, : ])
-            .type(torch.float32)
-            .reshape(6, self.resolution, self.resolution)
-        )
+        if not self.is_param_component_missing:
+            inputs = (
+                torch.from_numpy(self.reader["data"][shuffled_i, t1 + self.start_time, :, :, : ])
+                .type(torch.float32)
+                .reshape(6, self.resolution, self.resolution)
+            )
+            label = (
+                torch.from_numpy(self.reader["data"][shuffled_i, t2 + self.start_time, :, :, : ])
+                .type(torch.float32)
+                .reshape(6, self.resolution, self.resolution)
+            )
+        else:
+            A = self.reader["A"][shuffled_i]
+            B = self.reader["B"][shuffled_i]
+            Du = self.reader["Du"][shuffled_i]
+            Dv = self.reader["Dv"][shuffled_i]
+
+            const_fields = torch.tensor([A, B, Du, Dv], dtype=torch.float32).view(4, 1, 1)
+            const_fields = const_fields.expand(-1, self.resolution, self.resolution)
+
+            inputs = torch.cat((
+                torch.from_numpy(self.reader["data"][shuffled_i, t1 + self.start_time, :, :, :])
+                .type(torch.float32)
+                .reshape(2, self.resolution, self.resolution),
+                const_fields
+            ), dim=0)
+
+            label = torch.cat((
+                torch.from_numpy(self.reader["data"][shuffled_i, t2 + self.start_time, :, :, :])
+                .type(torch.float32)
+                .reshape(2, self.resolution, self.resolution),
+                const_fields
+            ), dim=0)
         
         if self.masked_input is not None:
             inputs_rho = torch.ones((1, self.resolution, self.resolution)).type(torch.float32)
@@ -1761,9 +1795,9 @@ class BrusselatorEval(BaseTimeDataset):
         super().__init__(*args, **kwargs)
         assert self.max_num_time_steps * self.time_step_size <= 150
 
-        self.N_max = 2_800
-        self.N_val = 10
-        self.N_test = 1200
+        self.N_max = 200
+        self.N_val = 1
+        self.N_test = 198
 
         self.start_time = 2
 

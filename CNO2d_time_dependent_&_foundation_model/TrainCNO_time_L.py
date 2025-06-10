@@ -19,11 +19,11 @@ if len(sys.argv) <= 2:
         "weight_decay": 1e-6,
         "scheduler_step": 1,
         "scheduler_gamma": 0.9,
-        "epochs": 75,
+        "epochs": 100,
         "batch_size": 32,         
         "time_steps": 7,          # How many time steps to select?
         "dt": 1,                  # What is the time step? (1 means include entire traj, 2 means taking every other step, etc.
-        "training_samples": 10800,   # How many training samples?
+        "training_samples": 10_000 - 60 - 240,   # How many training samples?
         "time_input": 1,          # Should we include time in the input channels?
         "allowed": 'all',         # All2ALL (train) - all , or One2All (train) - one2all, AR training - one
         "cluster": True,          # Something internal (don't bother)
@@ -32,7 +32,7 @@ if len(sys.argv) <= 2:
  
     model_architecture_ = {
         "N_layers": 4,            # Number of (D) & (U) blocks 
-        "channel_multiplier": 32, # Parameter d_e (how the number of channels changes)
+        "channel_multiplier": 48, # Parameter d_e (how the number of channels changes)
         "N_res": 8,               # Number of (R) blocks in the middle networs.
         "N_res_neck" : 8,         # Number of (R) blocks in the BN
         
@@ -66,7 +66,7 @@ if len(sys.argv) <= 2:
     # WHAT IS THE EXPERIMENT?
     which_example = "brusselator"
     
-    folder = "/cluster/scratch/vogtva/models/cno_delayed_2" 
+    folder = "/cluster/scratch/vogtva/models/bruss_final" 
     
 else:
     raise ValueError("To many args")
@@ -167,7 +167,7 @@ model   = CNO_time(in_dim =  loader_dict["in_dim"],
 
 #---------------------------------------------------------
 
-ver = 123 # Just a random string to be added to the model name
+ver = 100 # Just a random string to be added to the model name
 
 checkpoint_callback = ModelCheckpoint(dirpath = folder+"/model"+str(ver), monitor='mean_val_l')
 early_part = 10
